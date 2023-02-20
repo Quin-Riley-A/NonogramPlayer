@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Identity;
+// using Microsoft.AspNetCore.Identity;
 
-namespace NonogramPuzzle.Models
-{
-  public class ApplicationUser : IdentityUser
-  {
+// namespace NonogramPuzzle.Models
+// {
+//   public class ApplicationUser : IdentityUser
+//   {
     
-  }
-}
+//   }
+// }

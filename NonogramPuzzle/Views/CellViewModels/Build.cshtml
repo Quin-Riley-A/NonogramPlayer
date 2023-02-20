@@ -29,10 +29,16 @@ else
 {
   string[] imageNames = {"whitecell.png", "blackcell.png"};
 
+  <form>
+    <div class="puzzleSubmit">
+      <button name="completedPuzzle" value="@Model" type="submit" asp-controller="Nonograms" asp-action="Create"></button>
+    </div>
+  </form>
+
   <form> 
     <div class="cell-zone">
-      <input name="height" value="@Model.Height" type="hidden" asp-controller="CellViewModels" asp-action= "HandleCellClick" ></input>
-      <input name="width" value="@Model.Width" type="hidden" asp-controller="CellViewModels" asp-action= "HandleCellClick" ></input>
+      <input name="height" value="@Model.Height" type="hidden" asp-controller="CellViewModels" asp-action="HandleCellClick" ></input>
+      <input name="width" value="@Model.Width" type="hidden" asp-controller="CellViewModels" asp-action="HandleCellClick" ></input>
       @for (int i = 0; i < @Model.CellViewModels.Count(); i++)
       {
         if (i % @Model.Width == 0)

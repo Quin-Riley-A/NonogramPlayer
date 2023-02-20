@@ -55,7 +55,7 @@ namespace NonogramPuzzle.Controllers
       }
     }
 
-    public IActionResult HandleCellClick(string cellNumber ,string height, string width)
+    public IActionResult HandleCellClick(string cellNumber, string height, string width)
     {
 
       int cllNmbr = int.Parse(cellNumber);

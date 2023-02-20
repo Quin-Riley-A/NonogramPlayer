@@ -9,5 +9,7 @@ namespace NonogramPuzzle.Models
   {
     public int CellId { get; set; }
     public int CellState { get; set; }
+    public int NonogramId { get; set; }
+    public Nonogram Nonogram { get; set; }
   }
 }
