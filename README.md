@@ -1,25 +1,9 @@
-### To Do:
-Save the instance of the nonogram the creator has edited to the database
-and then generate a fresh blank board with clues for the nonogram for a solver
-
-cosmetic changes to cells and board itself
-
-ISSUE:
-
-1.cells wraps when the grid is too large for the screen. Also, the click function breaks.
-ex. app breaks at when gridsize is 21 by 21. 
-
-**Click function break ISSUE was resolve by moving the input fields out of the for loop 
-
-
-
-
 # Nonogram Puzzle Builder
 
 #### A webapp for creating and playing pixel based number puzzles called Nonograms or Picross. 
 
 ## Authored by:
-Athea DeLing, Bai Jaitrong, Quin Asselin, January 2023
+Athea DeLing, Bai Jaitrong, Quin Asselin, February 2023
 
 ***
 
