@@ -13,7 +13,9 @@ namespace NonogramPuzzle.Controllers
 {
   public class NonogramsController : Controller
   {
-    static List<Cell> cellList = new List<Cell>();
+    public static List<Cell> cellList = new List<Cell>();
+    public static Dictionary<int, List<int>> rowClues = new Dictionary<int, List<int>>();
+    public static Dictionary<int, List<int>> colClues = new Dictionary<int, List<int>>();
     private readonly NonogramPuzzleContext _db;
     
     public NonogramsController(NonogramPuzzleContext db)
@@ -55,66 +57,174 @@ namespace NonogramPuzzle.Controllers
       Nonogram thisNonogram = _db.Nonograms.Include(nono => nono.Cells)
       .FirstOrDefault(nonogram => nonogram.NonogramId == id);
 
+      
+      Nonogram nonogramSolution= new Nonogram();
+      nonogramSolution.Cells = thisNonogram.Cells;
       //calculating dimension for empty board with clues included
 
       int width = thisNonogram.NonogramWidth;
       int height = thisNonogram.NonogramHeight;
       int boardSize = thisNonogram.NonogramDim;//width * height;//thisNonogram.NonogramDim;
-      int maxHeight = 0;
-      int maxWidth = 0;
+      int maxColClues = 0;
+      int maxRowClues = 0;
 
       //calculation board height, accounting for max. number of clues in the columns
-      // i = rows/Height, j = columns/width
-      for(int j = 0; j < width ; j++)
-      {
-        int maxColClueCount = 0;
+      // i = rows/Height, j = columns/width, saving clue and board location
 
-        for(int i = j ; i <= (boardSize - (width - j)); i = (i + width ))
+      if (thisNonogram.Cells.Count != 0)
+      {
+        for(int j = 0; j < width ; j++)
         {
-          int previousCell = i;
-          if (i >= width)
-          {
-            previousCell = i - width;
+          int maxColCluesCount = 0;
+
+          for(int i = j ; i <= (boardSize - (width - j)); i = (i + width ))
+          {          
+            
+            int nextColCell = (i + width);
+            int priorColCell = ( i - width);
+  
+          
+            if( i == j && height == 1 && thisNonogram.Cells.ElementAt(i).CellState == 1)
+            {
+              maxColCluesCount++;
+            }
+            else if (i != (boardSize - (width - j)) && thisNonogram.Cells.ElementAt(i).CellState == 1 && thisNonogram.Cells.ElementAt(nextColCell).CellState == 0 )
+            {
+              maxColCluesCount++;
+            }
+            else if (i == (boardSize - (width - j)) &&  thisNonogram.Cells.ElementAt(i).CellState == 1 && thisNonogram.Cells.ElementAt(priorColCell).CellState != 1)
+            {
+              maxColCluesCount++;
+            }
+            else if ( (i == (boardSize - (width - j))) && (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(priorColCell).CellState == 1))
+            {
+              maxColCluesCount++;// when prior cell has cell state = 1 and last cell has state =1
+            }
           }
-          if (((thisNonogram.Cells.ElementAt(i).CellState == 1) && (i < width)) || ((thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(previousCell).CellState == 0)))
+          
+          if (maxColClues < maxColCluesCount)
           {
-            maxColClueCount ++;
+            maxColClues = maxColCluesCount;
           }
-        }
-        if( maxHeight < maxColClueCount)
-        {
-          maxHeight = maxColClueCount;
         }
       }
+      //original code
+      // for(int j = 0; j < width ; j++)
+      // {
+      //   int maxColClueCount = 0;
+
+      //   for(int i = j ; i <= (boardSize - (width - j)); i = (i + width ))
+      //   {
+      //     int previousCell = i;
+      //     if (i >= width)
+      //     {
+      //       previousCell = i - width;
+      //     }
+      //     if (((thisNonogram.Cells.ElementAt(i).CellState == 1) && (i < width)) || ((thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(previousCell).CellState == 0)))
+      //     {
+      //       maxColClueCount ++;
+      //     }
+      //   }
+      //   if( maxHeight < maxColClueCount)
+      //   {
+      //     maxHeight = maxColClueCount;
+      //   }
+      // }
+
 
       //calculation board width, account for max. clues in the rows
-      int maxRowClueCount = 0;
+      // int maxRowClueCount = 0;
 
-      for(int i = 0 ; i < boardSize; i ++)
-      {
-        if ( i % (width) == 0 && i != 0)
-        {
-          if(maxWidth < maxRowClueCount)
-          {
-            maxWidth = maxRowClueCount;
-          }
+      // for(int i = 0 ; i < boardSize; i ++)
+      // {
+      //   // if ( i % (width) == 0 && i != 0)
+      //   // {
+      //   //   if(maxWidth < maxRowClueCount)
+      //   //   {
+      //   //     maxWidth = maxRowClueCount;
+      //   //   }
 
-          maxRowClueCount = 0;
-        }
-        int previousCell = i;
-        if (i % width != 0)
-        {
-          previousCell = i-1;
-        }
+      //   //   maxRowClueCount = 0;
+      //   // }
+      //   int previousCell = i;
+      //   if (i % width != 0)
+      //   {
+      //     previousCell = i-1;
+      //   }
 
-        if (((thisNonogram.Cells.ElementAt(i).CellState == 1) && (i % width == 0)) || (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(previousCell).CellState == 0))
-          {
-            maxRowClueCount++;
-          }  
-      }
+      //   if (((thisNonogram.Cells.ElementAt(i).CellState == 1) && (i % width == 0)) || (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(previousCell).CellState == 0))
+      //     {
+      //       maxRowClueCount++;
+      //     } 
 
-      thisNonogram.solvingBoardWidth = maxWidth + width;
-      thisNonogram.solvingBoardHeight = maxHeight + height;
+      //   if ( i % (width) == 0 )
+      //   {
+      //     if(maxWidth < maxRowClueCount)
+      //     {
+      //       maxWidth = maxRowClueCount;
+      //     }
+
+      //     maxRowClueCount = 0;
+      //   } 
+          
+      // }
+
+      //locating and recording number of clues in column index, j = 0,1,...,n 
+      //row index, i is going to each element in each j columns. 
+      // colClues.Clear();
+
+      // List<int> colCluesList = new List<int>();
+     
+      // for(int j = 0; j < width ; j++)
+      // {
+      //   int colClueCount = 0;
+      
+      //   for(int i = j ; i <= (boardSize - (width - j)); i = (i + width ))
+      //   {
+      //     int nextColCell = i + width;
+          
+      //     if (thisNonogram.Cells.ElementAt(0).CellState == 1)
+      //     {
+      //       colClueCount++;
+      //     }
+          
+      //     if(i < (boardSize - (width - j)) && (colClueCount != 0))
+      //     {
+      //       if(thisNonogram.Cells.ElementAt(nextColCell).CellState == 0 )
+      //       {
+      //         colCluesList.Add(colClueCount);
+      //         colClueCount = 0; 
+      //       }
+      //     } 
+          
+      //     if( i == (boardSize - (width - j)) && thisNonogram.Cells.ElementAt(i).CellState == 1)
+      //     {
+      //       colClueCount++;
+      //       colCluesList.Add(colClueCount);
+      //     }
+      //     else
+      //     {
+      //       colCluesList.Add(colClueCount);
+      //     } 
+
+      //   }
+      //   colClues.Add(j,colCluesList);
+      // }
+
+      //If user submit a blank board
+
+      // if( maxRowClues == 0)
+      // {
+      //   maxRowClues = 1;
+      // }
+
+      // if(maxColClues == 0)
+      // {
+      //   maxColClues = 1;
+      // }
+  
+      thisNonogram.solvingBoardWidth = maxRowClues + width;
+      thisNonogram.solvingBoardHeight = maxColClues + height;
       thisNonogram.solvingBoardDim = (thisNonogram.solvingBoardWidth * thisNonogram.solvingBoardHeight);
 
       //Saving SolvingBoard Width, Height, and Dim to data base
@@ -124,7 +234,7 @@ namespace NonogramPuzzle.Controllers
       //clearing the static List object cellList, to preventing additional cells from being add when
       //cell states are being updated and puzzle board refreshes.
       cellList.Clear();
-    
+
       if (cellList.Count < thisNonogram.solvingBoardDim)
       {
         for( int i = 0; i < thisNonogram.solvingBoardDim; i++)
@@ -135,18 +245,39 @@ namespace NonogramPuzzle.Controllers
         thisNonogram.Cells = cellList;
       }
 
-      for( int j = 0 ; j < maxWidth ; j++)
-      {
-        int i = j + thisNonogram.solvingBoardWidth;
-        thisNonogram.Cells.ElementAt(j).CellState = 1;
-        thisNonogram.Cells.ElementAt(i).CellState = 1; 
-      }
+      
+      //marking non-game area on top left corner
+
+      // for( int j = 0 ; j < maxRowClues ; j++)
+      // {
+      //   for( int i = j; i < thisNonogram.solvingBoardHeight - maxColClues; i = i + thisNonogram.solvingBoardWidth)
+      //   {
+      //     thisNonogram.Cells.ElementAt(i).CellState = 2;
+      //     thisNonogram.Cells.ElementAt(i).Clue = "X";
+      //     thisNonogram.Cells.ElementAt(0).Clue = maxColClues.ToString();
+      //     thisNonogram.Cells.ElementAt(1).Clue = maxRowClues.ToString();
+      //   } 
+        // this section is for testing purposes
+        //thisNonogram.Cells.ElementAt(0).Clue = colClues[3].ElementAt(2).ToString();
+        // thisNonogram.Cells.ElementAt(3).Clue = boardSize.ToString();
+      //}
+
+      // //saving Column clues
+
+      // for (int j = maxWidth ; j < thisNonogram.solvingBoardWidth; j++)
+      // {
+      //   int dictionaryKey = j - maxWidth;
+      //   for (int i = j; i <= thisNonogram.solvingBoardWidth ; i = i + thisNonogram.solvingBoardWidth)
+      //   {
+      //     string clue="-1";
+      //     clue = colClues[dictionaryKey].ElementAt(dictionaryKey).ToString();
+      //     thisNonogram.Cells.ElementAt(i).Clue = clue;
+      //   }
+      // }
 
       //This will not be saved in the database
       return View(thisNonogram);
     }
-
-
 
     public ActionResult Edit(int id)
     {
