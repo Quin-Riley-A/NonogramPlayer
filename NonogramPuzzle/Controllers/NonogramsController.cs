@@ -83,7 +83,6 @@ namespace NonogramPuzzle.Controllers
             int nextColCell = (i + width);
             int priorColCell = ( i - width);
   
-          
             if( i == j && height == 1 && thisNonogram.Cells.ElementAt(i).CellState == 1)
             {
               maxColCluesCount++;
@@ -98,7 +97,7 @@ namespace NonogramPuzzle.Controllers
             }
             else if ( (i == (boardSize - (width - j))) && (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(priorColCell).CellState == 1))
             {
-              maxColCluesCount++;// when prior cell has cell state = 1 and last cell has state =1
+              maxColCluesCount++;// when prior cell has cell state = 1 and last cell has state = 1
             }
           }
           
@@ -108,67 +107,46 @@ namespace NonogramPuzzle.Controllers
           }
         }
       }
-      //original code
-      // for(int j = 0; j < width ; j++)
-      // {
-      //   int maxColClueCount = 0;
-
-      //   for(int i = j ; i <= (boardSize - (width - j)); i = (i + width ))
-      //   {
-      //     int previousCell = i;
-      //     if (i >= width)
-      //     {
-      //       previousCell = i - width;
-      //     }
-      //     if (((thisNonogram.Cells.ElementAt(i).CellState == 1) && (i < width)) || ((thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(previousCell).CellState == 0)))
-      //     {
-      //       maxColClueCount ++;
-      //     }
-      //   }
-      //   if( maxHeight < maxColClueCount)
-      //   {
-      //     maxHeight = maxColClueCount;
-      //   }
-      // }
-
-
+      
       //calculation board width, account for max. clues in the rows
-      // int maxRowClueCount = 0;
 
-      // for(int i = 0 ; i < boardSize; i ++)
-      // {
-      //   // if ( i % (width) == 0 && i != 0)
-      //   // {
-      //   //   if(maxWidth < maxRowClueCount)
-      //   //   {
-      //   //     maxWidth = maxRowClueCount;
-      //   //   }
+      int maxRowClueCount = 0;
+      int endOfRow = 0;
 
-      //   //   maxRowClueCount = 0;
-      //   // }
-      //   int previousCell = i;
-      //   if (i % width != 0)
-      //   {
-      //     previousCell = i-1;
-      //   }
+      for (int i = 0; i < boardSize; i++)
+      {
+        int nextRowCell = (i + 1);
+        int priorRowCell = ( i - 1);
 
-      //   if (((thisNonogram.Cells.ElementAt(i).CellState == 1) && (i % width == 0)) || (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(previousCell).CellState == 0))
-      //     {
-      //       maxRowClueCount++;
-      //     } 
+        if( (i % width) == 0 )
+        {  
+          maxRowClueCount = 0;
+          endOfRow = i + (width - 1);
+        }
+        
+        if( (i % width == 0) && (width == 1) && (thisNonogram.Cells.ElementAt(i).CellState == 1))
+        { 
+          maxRowClueCount++;
+        }
+        else if( (i < endOfRow) && (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(nextRowCell).CellState == 0))
+        {
+          maxRowClueCount++;
+        }
+        else if ((i == endOfRow) && (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(priorRowCell).CellState != 1))
+        {
+          maxRowClueCount++;
+        }
+        else if ((i == endOfRow) && (thisNonogram.Cells.ElementAt(i).CellState == 1) && (thisNonogram.Cells.ElementAt(priorRowCell).CellState == 1))
+        {
+          maxRowClueCount++;
+        }
 
-      //   if ( i % (width) == 0 )
-      //   {
-      //     if(maxWidth < maxRowClueCount)
-      //     {
-      //       maxWidth = maxRowClueCount;
-      //     }
-
-      //     maxRowClueCount = 0;
-      //   } 
-          
-      // }
-
+        if(maxRowClues < maxRowClueCount)
+          {
+            maxRowClues = maxRowClueCount;
+          }
+      }
+      
       //locating and recording number of clues in column index, j = 0,1,...,n 
       //row index, i is going to each element in each j columns. 
       // colClues.Clear();
